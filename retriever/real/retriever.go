@@ -11,7 +11,7 @@ type Retriever struct {
 	TimeOut   time.Duration
 }
 
-// 如果struct很大值传递拷贝费时间，采用指针类型
+// 如果struct很大值传递拷贝费时间，采用指针类型//指针接收者
 func (r *Retriever) Get(url string) string {
 
 	resp, err := http.Get(url)
