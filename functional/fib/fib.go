@@ -28,7 +28,7 @@ func (g intGen) Read(p []byte) (n int, err error) {
 
 	s := fmt.Sprintf("%d\n", next)
 
-	//p可能太小装不下一个数 解决办法把用struct 把strings.NewReader和intGen缓存起来
+	//p可能太小装不下一个数 解决办法把用struct 把strings.NewReader和intGen缓存起来TODO
 	return strings.NewReader(s).Read(p)
 
 }

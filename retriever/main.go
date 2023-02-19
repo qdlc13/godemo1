@@ -69,6 +69,7 @@ func main() {
 	//fmt.Printf("%T %v\n", r, r)
 	//fmt.Println(download(r))
 	//fmt.Println(download(r))
+	//fmt.Println(download(&test.Rr{Contents: "dd"}))
 	//r = &mock.Retriever{"This is a fake baidu.com"}
 	fmt.Println("Try a session")
 	fmt.Println(session(&retriever)) //不能传r因为r只有Retriever的能力缺少方法的实现
