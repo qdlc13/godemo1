@@ -15,16 +15,32 @@ func errWrapper(handler appHandler) func(writer http.ResponseWriter,
 	request *http.Request) {
 
 	return func(writer http.ResponseWriter, request *http.Request) {
+		defer func() {
+			//服务中断恢复保护代码
+			if r := recover(); r != nil {
+				log.Printf("Panic:%v", r)
+				http.Error(writer,
+					http.StatusText(http.StatusInternalServerError),
+					http.StatusInternalServerError)
+			}
+		}()
+
 		err := handler(writer, request)
 		if err != nil {
-			//log.Warn不是标准库的
+			//log.Warn是第三方库方法不是标准库的
 			log.Printf("Error handling request: %s", err.Error())
+			//用户自建错误 user error
+			if userError, ok := err.(userError); ok {
+				http.Error(writer, userError.Message(), http.StatusBadRequest)
+				return
+			}
+			//系统自带的错误system error
 			code := http.StatusOK
 			switch {
 			case os.IsNotExist(err): //不存在
 				code = http.StatusNotFound
-			case os.IsPermission(err):
-				code = http.StatusForbidden //无权限
+			case os.IsPermission(err): //无权限
+				code = http.StatusForbidden
 			default:
 				code = http.StatusInternalServerError
 			}
@@ -37,8 +53,13 @@ func errWrapper(handler appHandler) func(writer http.ResponseWriter,
 	}
 }
 
+type userError interface {
+	error            //系统
+	Message() string //用户
+}
+
 func main() {
-	http.HandleFunc("/list/", errWrapper(filelisting.HandleFileList))
+	http.HandleFunc("/", errWrapper(filelisting.HandleFileList))
 	err := http.ListenAndServe(":8888", nil)
 	if err != nil {
 		panic(err)
