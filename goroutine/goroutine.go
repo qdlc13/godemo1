@@ -21,7 +21,7 @@ func main() {
 			}
 		}(i)
 	}
-	//睡眠使得main慢点推出
+	//睡眠使得main慢点退出
 	time.Sleep(time.Millisecond)
 	fmt.Println(a)
 }
